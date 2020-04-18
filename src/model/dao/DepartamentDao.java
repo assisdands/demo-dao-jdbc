@@ -2,7 +2,7 @@ package model.dao;
 
 import java.util.List;
 
-import modal.entities.Departament;
+import model.entities.Departament;
 
 public interface DepartamentDao {
 

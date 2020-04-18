@@ -1,9 +1,9 @@
-package modal.entities;
+package model.entities;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import modal.entities.Departament;
+import model.entities.Departament;
 
 public class Seller implements Serializable {
 	
