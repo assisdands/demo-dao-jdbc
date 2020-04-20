@@ -1,6 +1,7 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,37 +29,33 @@ public class SellerDaoJDBC implements SellerDao {
 	public void insert(Seller obj) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement(
-					"INSERT INTO seller "
-					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
-					+ "VALUES "
-					+ "(?, ?, ?, ?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+			st = conn.prepareStatement("INSERT INTO seller " + "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES " + "(?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			st.setString(1, obj.getName());
-			st.setString(2,obj.getEmail());
+			st.setString(2, obj.getEmail());
 			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
 			st.setDouble(4, obj.getBaseSalary());
 			st.setInt(5, obj.getDepartment().getId());
-			
+
 			int rowsAffected = st.executeUpdate();
-			
-			if (rowsAffected > 0) { //significa que ele inseriu
-				ResultSet rs = st.getGeneratedKeys(); //esse ResultSet foi aberto aqui e posso fechar aqui mesmo, porque ele só foi criado dentro do iff
-				if(rs.next())  { //se existir esse cara, vou pegar o valor do id gerado
-					int id = rs.getInt(1); // na posição 1 porque será a primeira coluna das chaves, peguei o id gerado e vou atribuir ele dentro do objeto obj para que esse objeto já fique populado com o novo id dele
+
+			if (rowsAffected > 0) { // significa que ele inseriu
+				ResultSet rs = st.getGeneratedKeys(); // esse ResultSet foi aberto aqui e posso fechar aqui mesmo,
+														// porque ele só foi criado dentro do if
+				if (rs.next()) { // se existir esse cara, vou pegar o valor do id gerado
+					int id = rs.getInt(1); // na posição 1 porque será a primeira coluna das chaves, peguei o id gerado
+											// e vou atribuir ele dentro do objeto obj para que esse objeto já fique
+											// populado com o novo id dele
 					obj.setId(id);
 				}
-				
+
 				DB.closeResultSet(rs);
-			} 
-			else {
+			} else {
 				throw new DbException("Unexpected error! No rows affected!");
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
-		}
-		finally {
+		} finally {
 			DB.closeStatement(st);
 		}
 
@@ -66,7 +63,25 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void update(Seller obj) {
-		// TODO Auto-generated method stub
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement("UPDATE seller "
+					+ "SET name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? " + "WHERE id = ?");
+			
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getEmail());
+			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+			st.setDouble(4, obj.getBaseSalary());
+			st.setInt(5, obj.getDepartment().getId());
+			st.setInt(6, obj.getId());
+			
+			st.executeUpdate(); // não vou precisar saber quantas linhas foram afetadas, apenas uso para executar o update
+		
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+		}
 
 	}
 
